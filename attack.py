@@ -1,14 +1,12 @@
 import torch
 import torch.nn as nn
 
+import numpy as np
 
 mean, std = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
 mean, std = torch.Tensor(mean).cuda(), torch.Tensor(std).cuda()
 
-def ifgsm_DH(model, X, config):
-    model.eval()
-    model.cuda()
-
+def ifgsm(model, X, config):
     X_pert = X.clone()
     X = X.clone()
     X_pert.requires_grad = True
@@ -24,8 +22,8 @@ def ifgsm_DH(model, X, config):
         X_pert = update_adv(X, X_pert, pert, config['eps'])
         X_pert.requires_grad = True
 
-    return X_pert.clone().detach()
-
+    adv_ex = generate_x_adv(X_pert.clone().detach(),config["mean"],config['std'])
+    return adv_ex
 
 def update_adv(X, X_pert, pert, epsilon):
     X = X.clone().detach()
@@ -41,3 +39,17 @@ def update_adv(X, X_pert, pert, epsilon):
     X_pert = torch.clamp(X_pert, min=-mean/std, max=(1-mean)/std)
     X_pert = torch.permute(X_pert,(0,3,1,2))
     return X_pert.clone().detach()
+
+def generate_x_adv(x_adv, mean, std):
+    x_adv = x_adv.detach()
+    x_adv = normalize_inverse(x_adv, mean, std)
+    x_adv_img = np.transpose(x_adv.detach().cpu().numpy()[0], (1,2,0))
+    x_adv_img = np.asarray(np.round(x_adv_img,0),dtype=np.uint8)
+    return x_adv_img
+
+def normalize_inverse(img, mean, std):
+    for c, (mean_c, std_c) in enumerate(zip(mean, std)):
+        img[:,c,:,:] *= std_c
+        img[:,c,:,:] += mean_c
+    img *= 255
+    return img

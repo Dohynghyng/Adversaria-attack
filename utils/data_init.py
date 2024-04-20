@@ -31,10 +31,16 @@ class_index_to_rgb = {
     20: [0, 64, 128]
 }
 
+VOC_COLORMAP = [[0, 0, 0], [0, 0, 128], [0, 128, 0], [0, 128, 128], [128, 0, 0], [128, 0, 128],
+                [128, 128, 0], [128, 128, 128], [0, 0, 64], [0, 0, 192], [0, 128, 64], [0, 128, 192],
+                [128, 0, 64], [128, 0, 192], [128, 128, 64], [128, 128, 192], [0, 64, 0], [0, 64, 128],
+                [0, 192, 0], [0, 192, 128], [128, 64, 0],
+                ]
+
 rgb_to_class_index = {tuple(rgb): idx for idx, rgb in class_index_to_rgb.items()}
 
 def dataInit():
-    config = load_config.load_config()
+    config = load_config.loadConfig()
     print('Data loading it takes few minutes')
 
     if not os.path.isdir('./data/VOCdevkit/'):
@@ -72,7 +78,15 @@ def _colormap_to_ground_truth(image):
         ground_truth[mask] = class_index
     return ground_truth
 
+def visualize(pred):
+    # feature : d, h, w
+    pred_label = np.argmax(pred, axis=0)
+    img = np.zeros((pred_label.shape[0], pred_label.shape[1], 3), np.uint8)
 
+    for i in range(pred_label.shape[0]):
+        for j in range(pred_label.shape[1]):
+            img[i,j,:] = VOC_COLORMAP[pred_label[i][j]]
+    return img
 
 if __name__ == '__main__':
-    data_init()
+    dataInit()
