@@ -1,6 +1,6 @@
 save_path : 'temp'
 
-batch_size : 16
+batch_size : 64
 delta : 0.0001
 resolution : 256
 

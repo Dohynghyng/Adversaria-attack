@@ -14,14 +14,11 @@ def ifgsm(model, X, config):
         output_perturbed = model(X_pert)
         y_used = torch.zeros_like(output_perturbed) - config['delta']
         y_used = torch.FloatTensor(y_used.cpu()).cuda()
-
         loss = nn.MSELoss()(output_perturbed, y_used)
         loss.backward()
-
         pert = 1 * config['lr'] * X_pert.grad.detach().sign()
         X_pert = update_adv(X, X_pert, pert, config['eps'])
         X_pert.requires_grad = True
-
     adv_ex = generate_x_adv(X_pert.clone().detach(),config["mean"],config['std'])
     return adv_ex
 

@@ -5,7 +5,6 @@ import torch
 
 class ConfusionMatrix():
     _state_dict_all_req_keys = ("confusion_matrix", "_num_examples")
-
     def __init__(self,num_classes: int, device='cuda', average: Optional[str] = None,):
         self.num_classes = num_classes
         self._num_examples = 0
@@ -55,7 +54,6 @@ def IoU(cm: ConfusionMatrix, ignore_index: Optional[int] = None):
             raise ValueError(
                 f"ignore_index should be integer and in the range of [0, {cm.num_classes}), but given {ignore_index}"
             )
-    # Increase floating point precision and pass to CPU
     cm = cm.confusion_matrix
 
     iou = cm.diag() / (cm.sum(dim=1) + cm.sum(dim=0) - cm.diag() + 1e-15)

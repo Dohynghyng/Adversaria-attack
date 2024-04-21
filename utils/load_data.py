@@ -8,9 +8,7 @@ import torch
 import numpy as np
 from torchvision import transforms
 
-from metrics import ConfusionMatrix, mIoU
-
-# from ignite.metrics import ConfusionMatrix, mIoU
+from utils.metrics import ConfusionMatrix, mIoU
 
 class dataLoader():
     def __init__(self):
@@ -38,19 +36,22 @@ class dataLoader():
 
     def val(self,
             model,
-            model_name
-            ):
+            model_name,
+            avd_name=None):
+
+        if avd_name!=None:
+            model_name = f"{self.config['save_path']}/{avd_name}_{model_name}"
 
         batch_size = self.config['batch_size']
         cm = ConfusionMatrix(num_classes=21)
         cm.reset()
 
-        img_save_path = model_name + '/prediction/'
+        img_save_path = './runs/' + model_name + '/'
         if not os.path.isdir(img_save_path):
             os.makedirs(img_save_path)
 
         for itest in range(0, (self.images.shape[0] // batch_size) + 1):
-            print(f"{itest} / {(self.images.shape[0] // batch_size)}")
+            print(f"[{model_name}] {itest} / {(self.images.shape[0] // batch_size)}")
             start_num = itest * batch_size
             end_num = (itest + 1) * batch_size
             if end_num > self.images.shape[0]:
@@ -72,6 +73,12 @@ class dataLoader():
 
         model.cpu()
         return mIoU(cm)
+
+    def apply_adv(self, model_name):
+        for idx, f_name in enumerate(self.f_names):
+            self.images[idx] = cv2.resize(
+                cv2.cvtColor(cv2.imread(f"./runs/{self.config['save_path']}/{model_name}/{f_name}.jpg"), cv2.COLOR_BGR2RGB),
+                (self.config['resolution'], self.config['resolution']), interpolation=cv2.INTER_LINEAR)
 
 
 if __name__ == '__main__':

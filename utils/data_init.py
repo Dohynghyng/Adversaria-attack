@@ -62,7 +62,6 @@ def dataInit():
     ground_truth = [_colormap_to_ground_truth(gt_image) for gt_image in gt_images]
 
     images = np.asarray(images)
-    gt_images = np.asarray(gt_images)
     ground_truth = np.asarray(ground_truth)
 
     np.save(f"./data/{config['resolution']}/images.npy",images)
