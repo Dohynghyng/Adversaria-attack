@@ -34,6 +34,15 @@ class dataLoader():
         f_name = self.f_names[idx]
         return test_img, f_name
 
+    def traditional_batch_load(self, idx):
+        test_img = torch.FloatTensor(self.images[idx:idx+1] / 255.0)
+        test_img = self.transforms(torch.permute(test_img, (0, 3, 1, 2))).cuda()
+        test_gt = torch.FloatTensor(self.gts[idx:idx+1]).cuda()
+        f_name = self.f_names[idx]
+        return test_img, test_gt, f_name
+
+
+
     def val(self,
             model,
             model_name,
@@ -80,6 +89,11 @@ class dataLoader():
                 cv2.cvtColor(cv2.imread(f"./runs/{self.config['save_path']}/{model_name}/{f_name}.jpg"), cv2.COLOR_BGR2RGB),
                 (self.config['resolution'], self.config['resolution']), interpolation=cv2.INTER_LINEAR)
 
-
+    def apply_traditional_adv(self, model_name):
+        for idx, f_name in enumerate(self.f_names):
+            self.images[idx] = cv2.resize(
+                cv2.cvtColor(cv2.imread(f"./runs/traditional attack/{model_name}/{f_name}.jpg"), cv2.COLOR_BGR2RGB),
+                (self.config['resolution'], self.config['resolution']), interpolation=cv2.INTER_LINEAR)
+            
 if __name__ == '__main__':
     pass

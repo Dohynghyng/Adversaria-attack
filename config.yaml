@@ -1,4 +1,4 @@
-save_path : 'temp'
+save_path : 'traditional attack'
 
 batch_size : 64
 delta : 0.0001

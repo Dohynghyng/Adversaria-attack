@@ -22,6 +22,22 @@ def ifgsm(model, X, config):
     adv_ex = generate_x_adv(X_pert.clone().detach(),config["mean"],config['std'])
     return adv_ex
 
+def traditional_ifgsm(model, X, y, config):
+    X_pert = X.clone()
+    X = X.clone()
+    X_pert.requires_grad = True
+    for i in range(config['n_iter']):
+        output_perturbed = model(X_pert)
+        if isinstance(output_perturbed, dict):
+            output_perturbed = output_perturbed['out']
+        loss = nn.MSELoss()(output_perturbed, y)
+        loss.backward()
+        pert = 1 * config['lr'] * X_pert.grad.detach().sign()
+        X_pert = update_adv(X, X_pert, pert, config['eps'])
+        X_pert.requires_grad = True
+    adv_ex = generate_x_adv(X_pert.clone().detach(),config["mean"],config['std'])
+    return adv_ex
+
 def update_adv(X, X_pert, pert, epsilon):
     X = X.clone().detach()
     X_pert = X_pert.clone().detach()
