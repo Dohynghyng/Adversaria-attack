@@ -49,10 +49,10 @@ for source_model in source_model_list:
     for test_model in model_list:
         model = load_model.load_model(test_model)
         IoU = data_loader.val(model, test_model,avd_name=source_model)
-        with open(f"{config['save_path']}IoU.txt", "a") as f:
+        with open(f"./{config['save_path']}IoU.txt", "a") as f:
             f.write(f"{source_model}_{test_model} : {IoU}\n")
         print(f"{source_model}_{test_model} : {IoU}")
         print(f"{source_model}_{test_model} : {IoU}")
 
-    with open(f"{config['save_path']}IoU.txt", "a") as f:
+    with open(f"./{config['save_path']}IoU.txt", "a") as f:
         f.write("\n")
