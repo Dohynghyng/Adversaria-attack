@@ -8,6 +8,10 @@ from utils import load_model
 if not os.path.isdir('./runs'):
     os.mkdir('./runs')
 
+directory = "./runs/"
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
 config = load_config.loadConfig()
 
 config['save_path'] = './runs/' + config['save_path'] + '/'
@@ -35,12 +39,8 @@ for test_model in model_list:
         os.mkdir('./runs/' + test_model + '/')
         model = load_model.load_model(test_model)
         IoU = data_loader.val(model, test_model)
-        try:
-            with open("/runs/IoU.txt", "a") as f:
-                f.write(f"{test_model} : {IoU}\n")
-        except:
-            with open("/runs/IoU.txt", "w") as f:
-                f.write(f"{test_model} : {IoU}\n")
+        with open("./runs/IoU.txt", "a") as f:
+            f.write(f"{test_model} : {IoU}\n")
         print(f"{test_model} : {IoU}")
 
 # adv prediction
